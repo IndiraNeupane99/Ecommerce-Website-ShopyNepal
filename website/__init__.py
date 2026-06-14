@@ -10,6 +10,19 @@ db = SQLAlchemy()
 DB_NAME = 'database.sqlite3'
 
 
+def load_local_env():
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+    if os.path.exists(env_path):
+        with open(env_path, 'r', encoding='utf-8') as env_file:
+            for line in env_file:
+                line = line.strip()
+                if not line or line.startswith('#') or '=' not in line:
+                    continue
+                key, value = line.split('=', 1)
+                if key and value and key not in os.environ:
+                    os.environ[key] = value
+
+
 def create_database():
     db.create_all()
     print('Database Created')
@@ -26,7 +39,8 @@ def ensure_database_schema():
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'hbnwdvbn ajnbsjn ahe'
+    load_local_env()
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'hbnwdvbn ajnbsjn ahe')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
 
     db.init_app(app)

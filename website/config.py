@@ -1,6 +1,6 @@
-"
+"""
 Application Configuration and Constants
-"
+"""
 import os
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -8,14 +8,8 @@ import os
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Stripe API Keys - Use environment variables for security
-STRIPE_SECRET_KEY = os.environ.get(
-    'STRIPE_SECRET_KEY',
-    
-)
-STRIPE_PUBLISHABLE_KEY = os.environ.get(
-    'STRIPE_PUBLISHABLE_KEY',
-    
-)
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PRICING CONFIGURATION

@@ -1398,9 +1398,8 @@ from flask import Blueprint, render_template, flash, redirect, request, jsonify,
 from flask_login import login_required, current_user
 from .models import Product, Cart, Order, Wishlist, Customer, Message
 from . import db
-from .config import DELIVERY_CHARGE, VAT_RATE
+from .config import DELIVERY_CHARGE, VAT_RATE, STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY
 import stripe
-import os
 from datetime import datetime, timezone, timedelta
 import uuid
 
@@ -1428,8 +1427,9 @@ def nst_filter(dt):
 def nepal_now():
     return get_nepal_time()
 
-stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', )
-STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', )
+stripe.api_key = STRIPE_SECRET_KEY or ''
+if not STRIPE_SECRET_KEY:
+    print('Warning: STRIPE_SECRET_KEY is not configured. Stripe payments will fail until it is set.')
 # ──────────────────────────────────────────────────────────────────────────────
 # Helper: get cart items (DB for logged-in, session for guest)
 def get_cart():
@@ -1879,7 +1879,7 @@ def checkout():
                 db.session.rollback()
                 flash('Error placing order.', 'error')
                 return redirect('/cart')
-    return render_template('checkout.html', form=form, cart=cart, amount=base_amount, vat_amount=vat_amount, total=total_amount)
+    return render_template('checkout.html', form=form, cart=cart, amount=base_amount, vat_amount=vat_amount, total=total_amount, stripe_publishable_key=STRIPE_PUBLISHABLE_KEY)
 
 @views.route('/checkout-single/<int:cart_id>', methods=['GET', 'POST'])
 @login_required
@@ -2220,37 +2220,64 @@ def order():
 # ──────────────────────────────────────────────────────────────────────────────
 # Wishlist (login required)
 @views.route('/add-to-wishlist/<int:item_id>')
-@login_required
 def add_to_wishlist(item_id):
     item_to_add = Product.query.get(item_id)
     if not item_to_add:
         flash('Product not available.', 'error')
         return redirect(request.referrer or '/')
-    if Wishlist.query.filter_by(product_link=item_id, customer_link=current_user.id).first():
-        flash(f'{item_to_add.product_name} already in wishlist.', 'info')
+
+    if current_user.is_authenticated:
+        if Wishlist.query.filter_by(product_link=item_id, customer_link=current_user.id).first():
+            flash(f'{item_to_add.product_name} already in wishlist.', 'info')
+            return redirect(request.referrer or '/')
+        new_item = Wishlist(product_link=item_id, customer_link=current_user.id)
+        db.session.add(new_item)
+        db.session.commit()
+        flash(f'{item_to_add.product_name} added to wishlist.', 'success')
         return redirect(request.referrer or '/')
-    new_item = Wishlist(product_link=item_id, customer_link=current_user.id)
-    db.session.add(new_item)
-    db.session.commit()
-    flash(f'{item_to_add.product_name} added to wishlist.', 'success')
+
+    guest_wishlist = session.get('guest_wishlist', [])
+    if item_id in guest_wishlist:
+        flash(f'{item_to_add.product_name} already in wishlist.', 'info')
+    else:
+        guest_wishlist.append(item_id)
+        session['guest_wishlist'] = guest_wishlist
+        flash(f'{item_to_add.product_name} added to wishlist.', 'success')
     return redirect(request.referrer or '/')
 
 @views.route('/remove-from-wishlist/<int:item_id>')
-@login_required
 def remove_from_wishlist(item_id):
-    wishlist_item = Wishlist.query.filter_by(product_link=item_id, customer_link=current_user.id).first()
-    if not wishlist_item:
-        flash('Item not found in wishlist.', 'error')
+    if current_user.is_authenticated:
+        wishlist_item = Wishlist.query.filter_by(product_link=item_id, customer_link=current_user.id).first()
+        if not wishlist_item:
+            flash('Item not found in wishlist.', 'error')
+            return redirect(request.referrer or '/wishlist')
+        db.session.delete(wishlist_item)
+        db.session.commit()
+        flash('Item removed from wishlist.', 'success')
         return redirect(request.referrer or '/wishlist')
-    db.session.delete(wishlist_item)
-    db.session.commit()
-    flash('Item removed from wishlist.', 'success')
+
+    guest_wishlist = session.get('guest_wishlist', [])
+    if item_id in guest_wishlist:
+        guest_wishlist.remove(item_id)
+        session['guest_wishlist'] = guest_wishlist
+        flash('Item removed from wishlist.', 'success')
+    else:
+        flash('Item not found in wishlist.', 'error')
     return redirect(request.referrer or '/wishlist')
 
 @views.route('/wishlist')
-@login_required
 def wishlist():
-    wishlist_items = Wishlist.query.filter_by(customer_link=current_user.id).all()
+    if current_user.is_authenticated:
+        wishlist_items = Wishlist.query.filter_by(customer_link=current_user.id).all()
+    else:
+        guest_wishlist = session.get('guest_wishlist', [])
+        wishlist_items = []
+        from types import SimpleNamespace
+        for item_id in guest_wishlist:
+            product = Product.query.get(item_id)
+            if product:
+                wishlist_items.append(SimpleNamespace(product=product))
     return render_template('wishlist.html', wishlist_items=wishlist_items, cart=get_cart())
 
 # ──────────────────────────────────────────────────────────────────────────────
