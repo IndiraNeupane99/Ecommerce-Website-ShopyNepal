@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %} Messages & Chat | ShopyNepal {% endblock %}
+
+{% block body %}
+
+<div class="container my-5">
+    <div class="row">
+        <h1 class="text-center mb-5" style="color: white;">Messages & Chat</h1>
+
+        <div class="col-md-12">
+            <!-- Chat Interface -->
+            <div class="card mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, #f57224, #e05c10); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-comments"></i> Chat with Admin</h5>
+                </div>
+                <div class="card-body" style="height: 400px; overflow-y: auto;" id="chatContainer">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div
+                        class="message-item {% if message.sender_type == 'admin' %}admin-message{% else %}user-message{% endif %} mb-3 p-3 rounded">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="message-content">
+                                <strong>
+                                    {% if message.sender_type == 'admin' %}
+                                    <i class="fas fa-shield-alt text-primary"></i> Admin
+                                    {% else %}
+                                    <i class="fas fa-user text-success"></i> You
+                                    {% endif %}
+                                </strong>
+                                {% if message.subject %}
+                                <div class="text-muted small">{{ message.subject }}</div>
+                                {% endif %}
+                                <div class="mt-2">{{ message.message_text }}</div>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i>
+                                    {{ to_nepal_time(message.date_sent) }} </small>
+                            </div>
+                            {% if message.sender_type == 'admin' %}
+                            <span class="badge bg-info">From Admin</span>
+                            {% else %}
+                            <span class="badge bg-success">Sent</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-comments fa-3x mb-3"></i>
+                        <h5>No messages yet</h5>
+                        <p>Start a conversation with our admin team!</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <form method="POST" action="/send-message" id="messageForm">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="subject" placeholder="Subject (optional)"
+                                    maxlength="200">
+                            </div>
+                            <div class="col-md-6">
+                                <textarea class="form-control" name="message" rows="2"
+                                    placeholder="Type your message here..." required maxlength="1000"></textarea>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100" id="sendBtn">
+                                    <i class="fas fa-paper-plane"></i> Send
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Message History (Collapsible) -->
+            <div class="card">
+                <div class="card-header" style="cursor: pointer;" data-bs-toggle="collapse"
+                    data-bs-target="#messageHistory">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history"></i> Message History
+                        <i class="fas fa-chevron-down float-end"></i>
+                    </h5>
+                </div>
+                <div class="collapse show" id="messageHistory">
+                    <div class="card-body">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert {% if message.sender_type == 'admin' %}alert-info{% else %}alert-success{% endif %} alert-dismissible fade show"
+                            role="alert">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6>
+                                        {% if message.sender_type == 'admin' %}
+                                        <i class="fas fa-shield-alt me-2"></i><strong>Admin Message</strong>
+                                        {% else %}
+                                        <i class="fas fa-user me-2"></i><strong>Your Message</strong>
+                                        {% endif %}
+                                    </h6>
+                                    {% if message.subject %}
+                                    <p class="mb-1"><strong>Subject:</strong> {{ message.subject }}</p>
+                                    {% endif %}
+                                    <p class="mb-2">{{ message.message_text }}</p>
+                                    <small class="text-muted">
+                                      <i class="fas fa-clock me-1"></i> {{ message.nepali_time }}
+                                    </small>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    {% if message.sender_type == 'admin' %}
+                                    <span class="badge bg-info">From Admin</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Your Message</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="alert alert-info text-center" role="alert">
+                            <h5>No messages yet</h5>
+                            <p>You can send a message from the chat above or from the <a href="/contact">Contact
+                                    Page</a></p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .message-item {
+        border-left: 4px solid;
+        background: #f8f9fa;
+    }
+
+    .admin-message {
+        border-left-color: #0d6efd;
+        background: #e7f3ff;
+    }
+
+    .user-message {
+        border-left-color: #198754;
+        background: #e8f5e8;
+        margin-left: auto;
+        max-width: 70%;
+    }
+
+    #chatContainer {
+        scroll-behavior: smooth;
+    }
+
+    #messageForm textarea {
+        resize: none;
+    }
+
+    .card-header[data-bs-toggle="collapse"] {
+        transition: background-color 0.3s;
+    }
+
+    .card-header[data-bs-toggle="collapse"]:hover {
+        background-color: rgba(245, 114, 36, 0.1) !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Scroll to bottom of chat
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Form submission
+        const messageForm = document.getElementById('messageForm');
+        const sendBtn = document.getElementById('sendBtn');
+
+        messageForm.addEventListener('submit', function (e) {
+            sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending...';
+            sendBtn.disabled = true;
+        });
+
+        // Auto-resize textarea
+        const textarea = messageForm.querySelector('textarea');
+        textarea.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+</script>
+
+{% endblock %}

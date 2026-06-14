@@ -1,0 +1,533 @@
+/* ============================================
+   MODERN FORMS STYLING - ATTRACTIVE & RESPONSIVE
+   ============================================ */
+
+:root {
+    /* Background Configuration - EASY TO CHANGE */
+    --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --bg-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --bg-tertiary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --bg-overlay: rgba(0, 0, 0, 0.3);
+    
+    /* Current Active Background - CHANGE THIS LINE TO SWITCH BACKGROUNDS */
+    --active-bg: var(--bg-primary);
+
+    /* Colors */
+    --primary: #f57224;
+    --primary-dark: #e05c10;
+    --primary-light: #fff0e6;
+    --secondary: #2c3e50;
+    --accent: #20D489;
+    --danger: #ef4444;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --white: #ffffff;
+    --gray: #6c757d;
+    --gray-light: #f8f9fa;
+    --border: #e9ecef;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.15);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.2);
+    --shadow-xl: 0 20px 40px rgba(0,0,0,0.25);
+
+    /* Border Radius */
+    --radius: 16px;
+    --radius-sm: 12px;
+    --radius-lg: 24px;
+
+    /* Transitions */
+    --transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: url('/static/images/background 2.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Animated Background Overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: -1;
+}
+
+/* Floating Shapes Animation */
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg); 
+    }
+    50% { 
+        transform: translateY(-20px) rotate(180deg); 
+    }
+}
+
+.floating-shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float 6s ease-in-out infinite;
+}
+
+.floating-shape:nth-child(1) {
+    width: 80px;
+    height: 80px;
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.floating-shape:nth-child(2) {
+    width: 60px;
+    height: 60px;
+    top: 20%;
+    right: 10%;
+    animation-delay: 2s;
+}
+
+.floating-shape:nth-child(3) {
+    width: 100px;
+    height: 100px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 4s;
+}
+
+.floating-shape:nth-child(4) {
+    width: 40px;
+    height: 40px;
+    bottom: 10%;
+    right: 20%;
+    animation-delay: 1s;
+}
+
+/* Main Container */
+.base {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.base-content {
+    width: 100%;
+    max-width: 450px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Form Card */
+.form {
+    background: rgba(20, 25, 35, 0.95);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    padding: 1.15rem;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Close Button */
+.form-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 35px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    z-index: 10;
+}
+
+.form-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.form-close-btn i {
+    color: #ffffff;
+    font-size: 1.1rem;
+    transition: var(--transition);
+}
+
+.form-close-btn:hover i {
+    color: var(--danger);
+}
+
+.form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* Form Header */
+.form h3 {
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.25rem;
+    position: relative;
+}
+
+.form h3::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 2px;
+}
+
+/* Form Sections */
+.email, .password, .name {
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.email h4, .password h4, .name h4 {
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.email h4 i, .password h4 i, .name h4 i {
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+/* Form Inputs */
+.form input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    transition: var(--transition);
+    outline: none;
+}
+
+.form input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(245, 114, 36, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.form input::placeholder {
+    color: #b0b0b0;
+    opacity: 0.8;
+}
+
+/* Form Separator */
+.form hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 1rem 0;
+}
+
+/* Buttons Container */
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.buttons input, .buttons a {
+    padding: 0.875rem 2rem;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: var(--transition);
+    cursor: pointer;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.buttons input {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    border: none;
+}
+
+.buttons input:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.buttons a {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.buttons a:hover {
+    background: var(--primary);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* Alert Messages */
+.alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    border-radius: var(--radius);
+    border: none;
+    box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablet */
+@media (max-width: 768px) {
+    .base-content {
+        max-width: 350px;
+        margin: 0 auto;
+    }
+
+    .form {
+        padding: 1.5rem;
+        margin: 0 auto;
+        max-width: 330px;
+        width: 100%;
+    }
+
+    .form h3 {
+        font-size: 1.75rem;
+    }
+
+    .floating-shape {
+        display: none;
+    }
+
+    .form-close-btn {
+        width: 32px;
+        height: 32px;
+        top: 12px;
+        right: 12px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    .base {
+        padding: 10px;
+    }
+
+    .base-content {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .form {
+        padding: 1.25rem;
+        border-radius: var(--radius);
+        margin: 0 auto;
+        max-width: 95vw;
+        width: 100%;
+    }
+
+    .form h3 {
+        font-size: 1.5rem;
+    }
+
+    .email h4, .password h4, .name h4 {
+        font-size: 0.85rem;
+    }
+
+    .form input {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .buttons {
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .buttons input, .buttons a {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .alert {
+        position: static;
+        margin: 1rem auto;
+        max-width: 95vw;
+    }
+
+    .form-close-btn {
+        width: 30px;
+        height: 30px;
+        top: 10px;
+        right: 10px;
+    }
+
+    .form-close-btn i {
+        font-size: 1rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .base {
+        padding: 5px;
+    }
+
+    .base-content {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .form {
+        padding: 1.25rem;
+        margin: 0 auto;
+        max-width: 95vw;
+        width: 100%;
+    }
+
+    .form h3 {
+        font-size: 1.25rem;
+    }
+
+    .buttons input, .buttons a {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .form-close-btn {
+        width: 28px;
+        height: 28px;
+        top: 8px;
+        right: 8px;
+    }
+
+    .alert {
+        margin: 0.5rem auto;
+        max-width: 95vw;
+    }
+}
+
+/* ============================================
+   ANIMATIONS & EFFECTS
+   ============================================ */
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form {
+    animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+}
+
+.buttons input:hover {
+    animation: pulse 0.3s ease-in-out;
+}
+
+/* ============================================
+   ACCESSIBILITY & FOCUS
+   ============================================ */
+
+.form input:focus,
+.buttons input:focus,
+.buttons a:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .form {
+        background: var(--white);
+        border: 2px solid var(--secondary);
+    }
+
+    .form input {
+        border: 2px solid var(--secondary);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

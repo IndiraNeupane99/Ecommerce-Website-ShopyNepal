@@ -1,0 +1,555 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer Management | Admin Panel{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid px-3 px-md-4 px-lg-5 py-4">
+    <!-- Header Section with Back Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+                <a href="/admin-page" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm hover-effect">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+                <div class="text-center text-sm-end">
+                    <h1 class="display-6 fw-bold gradient-text mb-0">
+                        <i class="fas fa-users me-3"></i>Customer Management
+                    </h1>
+                    <p class="text-muted mt-2 mb-0">View and manage all registered customers</p>
+                </div>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <!-- <div class="row g-3 g-md-4 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm hover-lift">
+                <div class="card-body d-flex align-items-center justify-content-between p-3 p-md-4">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Customers</h6>
+                        <h2 class="mb-0 fw-bold">{{ customers|length }}</h2>
+                    </div>
+                    <div class="icon-circle bg-primary bg-opacity-10">
+                        <i class="fas fa-users fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm hover-lift">
+                <div class="card-body d-flex align-items-center justify-content-between p-3 p-md-4">
+                    <div>
+                        <h6 class="text-muted mb-1">Active This Month</h6>
+                        <h2 class="mb-0 fw-bold">{{ customers|selectattr('last_login', 'defined')|list|length }}</h2>
+                    </div>
+                    <div class="icon-circle bg-success bg-opacity-10">
+                        <i class="fas fa-user-check fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm hover-lift">
+                <div class="card-body d-flex align-items-center justify-content-between p-3 p-md-4">
+                    <div>
+                        <h6 class="text-muted mb-1">New This Week</h6>
+                        <h2 class="mb-0 fw-bold">0</h2>
+                    </div>
+                    <div class="icon-circle bg-info bg-opacity-10">
+                        <i class="fas fa-user-plus fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm hover-lift">
+                <div class="card-body d-flex align-items-center justify-content-between p-3 p-md-4">
+                    <div>
+                        <h6 class="text-muted mb-1">With Orders</h6>
+                        <h2 class="mb-0 fw-bold">0</h2>
+                    </div>
+                    <div class="icon-circle bg-warning bg-opacity-10">
+                        <i class="fas fa-shopping-bag fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Search and Filter Bar -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" id="searchCustomer" class="form-control border-start-0" 
+                               placeholder="Search by name, email, or username...">
+                    </div>
+                </div>
+                <div class="col-12 col-md-3">
+                    <select id="sortCustomers" class="form-select">
+                        <option value="id">Sort by ID</option>
+                        <option value="name">Sort by Name</option>
+                        <option value="date">Sort by Date Joined</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <button class="btn btn-primary w-100" id="exportCustomers">
+                        <i class="fas fa-download me-2"></i>Export List
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customers Table -->
+    <div class="card border-0 shadow-lg">
+        <div class="card-header bg-gradient py-3">
+            <h5 class="mb-0 fw-bold">
+                <i class="fas fa-list me-2"></i>Registered Customers
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="customersTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-3 px-md-4">ID</th>
+                            <th>Customer</th>
+                            <th>Contact Info</th>
+                            <th>Joined Date</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr class="customer-row fade-in" data-customer-id="{{ customer.id }}">
+                            <td class="px-3 px-md-4 fw-semibold">#{{ customer.id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="customer-avatar bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-user text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <strong>{{ customer.username }}</strong>
+                                        {% if customer.full_name %}
+                                        <br>
+                                        <small class="text-muted">{{ customer.full_name }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <i class="fas fa-envelope me-1 text-muted"></i>
+                                <a href="mailto:{{ customer.email }}" class="text-decoration-none">{{ customer.email }}</a>
+                            </td>
+                            <td>
+                                <i class="far fa-calendar-alt me-1 text-muted"></i>
+                                {{ customer.date_joined.strftime('%b %d, %Y') }}
+                                <br>
+                                <small class="text-muted">{{ customer.date_joined.strftime('%I:%M %p') }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                    <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Active
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a href="/admin/customer-details/{{ customer.id }}" 
+                                       class="btn btn-sm btn-info rounded-pill px-3">
+                                        <i class="fas fa-eye me-1"></i> View
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill ms-2 quick-contact-btn"
+                                            data-customer-name="{{ customer.username }}"
+                                            data-customer-email="{{ customer.email }}">
+                                        <i class="fas fa-envelope me-1"></i> Message
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-light">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+                <div class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Showing {{ customers|length }} customers
+                </div>
+                <div class="btn-group" role="group">
+                    <button class="btn btn-sm btn-outline-secondary" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary active">1</button>
+                    <button class="btn btn-sm btn-outline-secondary" disabled>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Message Modal -->
+<div class="modal fade" id="quickMessageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient">
+                <h5 class="modal-title">
+                    <i class="fas fa-paper-plane me-2"></i>Send Message to Customer
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">To:</label>
+                    <p class="form-control-plaintext" id="messageCustomerName"></p>
+                    <p class="form-control-plaintext text-muted small" id="messageCustomerEmail"></p>
+                </div>
+                <div class="mb-3">
+                    <label for="messageSubject" class="form-label fw-semibold">Subject</label>
+                    <input type="text" class="form-control" id="messageSubject" placeholder="Enter message subject">
+                </div>
+                <div class="mb-3">
+                    <label for="customerMessage" class="form-label fw-semibold">Message</label>
+                    <textarea class="form-control" id="customerMessage" rows="5" placeholder="Type your message here..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="sendCustomerMessage">
+                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Styles */
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stat-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 15px;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    }
+
+    .icon-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (min-width: 768px) {
+        .icon-circle {
+            width: 55px;
+            height: 55px;
+        }
+    }
+
+    .customer-avatar {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+    }
+
+    @media (min-width: 768px) {
+        .customer-avatar {
+            width: 45px;
+            height: 45px;
+            min-width: 45px;
+        }
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+        padding: 12px 8px;
+    }
+
+    @media (min-width: 768px) {
+        .table th, .table td {
+            padding: 16px 12px;
+        }
+    }
+
+    .bg-gradient {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .hover-effect {
+        transition: all 0.3s ease;
+    }
+
+    .hover-effect:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.4s ease-out;
+    }
+
+    /* Search highlight */
+    .highlight {
+        background-color: #fff3cd;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .display-6 {
+            font-size: 1.5rem;
+        }
+        
+        .btn-group {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .btn-group .btn {
+            margin-left: 0 !important;
+        }
+        
+        .table th, .table td {
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container-fluid {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .customer-avatar {
+            width: 35px;
+            height: 35px;
+            min-width: 35px;
+        }
+        
+        .table th, .table td {
+            padding: 8px 4px;
+        }
+        
+        .btn-sm {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+        }
+    }
+
+    /* Hover effects */
+    .customer-row {
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .customer-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Modal animation */
+    .modal-content {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+    // Search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchCustomer');
+        const customerRows = document.querySelectorAll('.customer-row');
+        const sortSelect = document.getElementById('sortCustomers');
+        const tbody = document.querySelector('#customersTable tbody');
+        
+        // Search customers
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                customerRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                        // Highlight matching text
+                        if (searchTerm) {
+                            row.classList.add('highlight');
+                            setTimeout(() => {
+                                row.classList.remove('highlight');
+                            }, 2000);
+                        }
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Update visible count
+                const visibleRows = document.querySelectorAll('.customer-row[style="display: "]');
+                const countText = document.querySelector('.text-muted');
+                if (countText) {
+                    const total = customerRows.length;
+                    const visible = visibleRows.length;
+                    countText.innerHTML = `<i class="fas fa-info-circle me-1"></i>Showing ${visible} of ${total} customers`;
+                }
+            });
+        }
+        
+        // Sort customers
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                const sortBy = this.value;
+                const rows = Array.from(customerRows);
+                
+                rows.sort((a, b) => {
+                    let aVal, bVal;
+                    
+                    if (sortBy === 'id') {
+                        aVal = parseInt(a.getAttribute('data-customer-id'));
+                        bVal = parseInt(b.getAttribute('data-customer-id'));
+                    } else if (sortBy === 'name') {
+                        aVal = a.querySelector('td:nth-child(2) strong').textContent;
+                        bVal = b.querySelector('td:nth-child(2) strong').textContent;
+                        return aVal.localeCompare(bVal);
+                    } else if (sortBy === 'date') {
+                        aVal = a.querySelector('td:nth-child(4)').textContent;
+                        bVal = b.querySelector('td:nth-child(4)').textContent;
+                    }
+                    
+                    return aVal - bVal;
+                });
+                
+                if (sortBy === 'name') {
+                    rows.sort((a, b) => {
+                        const aName = a.querySelector('td:nth-child(2) strong').textContent;
+                        const bName = b.querySelector('td:nth-child(2) strong').textContent;
+                        return aName.localeCompare(bName);
+                    });
+                }
+                
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        }
+        
+        // Quick Message Modal
+        const quickMessageModal = new bootstrap.Modal(document.getElementById('quickMessageModal'));
+        const messageCustomerName = document.getElementById('messageCustomerName');
+        const messageCustomerEmail = document.getElementById('messageCustomerEmail');
+        const messageSubject = document.getElementById('messageSubject');
+        const customerMessage = document.getElementById('customerMessage');
+        const sendCustomerMessage = document.getElementById('sendCustomerMessage');
+        
+        document.querySelectorAll('.quick-contact-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const customerName = this.getAttribute('data-customer-name');
+                const customerEmail = this.getAttribute('data-customer-email');
+                
+                if (messageCustomerName) messageCustomerName.textContent = customerName;
+                if (messageCustomerEmail) messageCustomerEmail.textContent = customerEmail;
+                if (messageSubject) messageSubject.value = '';
+                if (customerMessage) customerMessage.value = '';
+                
+                quickMessageModal.show();
+            });
+        });
+        
+        if (sendCustomerMessage) {
+            sendCustomerMessage.addEventListener('click', function() {
+                const subject = messageSubject ? messageSubject.value.trim() : '';
+                const message = customerMessage ? customerMessage.value.trim() : '';
+                
+                if (!subject) {
+                    alert('Please enter a subject.');
+                    return;
+                }
+                
+                if (!message) {
+                    alert('Please enter a message.');
+                    return;
+                }
+                
+                // Here you would typically send the message via AJAX
+                alert('Message sent successfully!');
+                quickMessageModal.hide();
+            });
+        }
+        
+        // Export customers list
+        const exportBtn = document.getElementById('exportCustomers');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', function() {
+                const table = document.getElementById('customersTable');
+                const rows = table.querySelectorAll('tr');
+                let csv = [];
+                
+                // Get headers
+                const headers = [];
+                table.querySelectorAll('thead th').forEach(th => {
+                    headers.push(th.textContent.trim());
+                });
+                csv.push(headers.join(','));
+                
+                // Get data rows
+                rows.forEach(row => {
+                    const rowData = [];
+                    row.querySelectorAll('td').forEach((td, index) => {
+                        if (index < 4) { // Only export relevant columns
+                            let text = td.textContent.trim();
+                            // Clean up text
+                            text = text.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+                            rowData.push(`"${text}"`);
+                        }
+                    });
+                    if (rowData.length) csv.push(rowData.join(','));
+                });
+                
+                // Download CSV
+                const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,577 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Product | Inventory Management{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid px-3 px-md-4 px-lg-5 py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+                <a href="/shop-items" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm hover-effect">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Products
+                </a>
+                <div class="text-center text-sm-end">
+                    <h1 class="display-6 fw-bold gradient-text mb-0">
+                        <i class="fas fa-plus-circle me-3"></i>Add New Product
+                    </h1>
+                    <p class="text-muted mt-2 mb-0">Add a new product to your inventory</p>
+                </div>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+
+    <!-- Main Form Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-box-open me-2"></i>Product Information
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form action="" method="POST" enctype="multipart/form-data" id="productForm">
+                        {{ form.hidden_tag() }}
+
+                        <div class="row g-4">
+                            <!-- Product Name -->
+                            <div class="col-md-6">
+                                <label for="product_name" class="form-label fw-semibold">
+                                    <i class="fas fa-tag me-1 text-primary"></i>Product Name
+                                </label>
+                                {{ form.product_name(class="form-control form-control-lg", placeholder="Enter product name", id="product_name") }}
+                                {% if form.product_name.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.product_name.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Choose a descriptive name for your product</div>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <label for="category" class="form-label fw-semibold">
+                                    <i class="fas fa-folder me-1 text-primary"></i>Category
+                                </label>
+                                {{ form.category(class="form-select form-select-lg", id="category") }}
+                                {% if form.category.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.category.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Select the appropriate category for your product</div>
+                            </div>
+
+                            <!-- Subcategory -->
+                            <div class="col-md-6">
+                                <label for="subcategory" class="form-label fw-semibold">
+                                    <i class="fas fa-stream me-1 text-primary"></i>Subcategory
+                                </label>
+                                {{ form.subcategory(class="form-select form-select-lg", id="subcategory", data_selected=form.subcategory.data or '') }}
+                                {% if form.subcategory.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.subcategory.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Select a subcategory that matches the selected category</div>
+                            </div>
+
+                            <!-- Current Price -->
+                            <div class="col-md-6">
+                                <label for="current_price" class="form-label fw-semibold">
+                                    <i class="fas fa-dollar-sign me-1 text-success"></i>Current Price (NPR)
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">NPR</span>
+                                    {{ form.current_price(class="form-control form-control-lg", placeholder="0.00", type="number", step="0.01", id="current_price") }}
+                                </div>
+                                {% if form.current_price.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.current_price.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Current selling price of the product</div>
+                            </div>
+
+                            <!-- Previous Price -->
+                            <div class="col-md-6">
+                                <label for="previous_price" class="form-label fw-semibold">
+                                    <i class="fas fa-history me-1 text-warning"></i>Previous Price (NPR)
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">NPR</span>
+                                    {{ form.previous_price(class="form-control form-control-lg", placeholder="0.00", type="number", step="0.01", id="previous_price") }}
+                                </div>
+                                {% if form.previous_price.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.previous_price.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Previous price (optional; for discount display)</div>
+                            </div>
+
+                            <!-- Stock Quantity -->
+                            <div class="col-md-6">
+                                <label for="in_stock" class="form-label fw-semibold">
+                                    <i class="fas fa-boxes me-1 text-info"></i>Stock Quantity
+                                </label>
+                                {{ form.in_stock(class="form-control form-control-lg", placeholder="0", type="number", min="0", id="in_stock") }}
+                                {% if form.in_stock.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.in_stock.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Number of units available in inventory</div>
+                            </div>
+
+                            <!-- Product Image -->
+                            <div class="col-md-6">
+                                <label for="product_picture" class="form-label fw-semibold">
+                                    <i class="fas fa-image me-1 text-danger"></i>Product Image
+                                </label>
+                                <div class="image-upload-container">
+                                    {{ form.product_picture(class="form-control form-control-lg", id="product_picture", accept="image/*") }}
+                                    <div class="image-preview mt-3 text-center" id="imagePreview" style="display: none;">
+                                        <img id="previewImg" src="#" alt="Preview" class="img-fluid rounded shadow-sm" style="max-height: 200px;">
+                                        <button type="button" class="btn btn-sm btn-danger mt-2" id="removeImage">
+                                            <i class="fas fa-trash me-1"></i>Remove Image
+                                        </button>
+                                    </div>
+                                </div>
+                                {% if form.product_picture.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.product_picture.errors %}
+                                            <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Supported formats: JPG, PNG, GIF (Max 5MB)</div>
+                            </div>
+
+                            <!-- Flash Sale Option -->
+                            <div class="col-12">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            {{ form.flash_sale(class="form-check-input", id="flash_sale", role="switch") }}
+                                            <label class="form-check-label fw-semibold" for="flash_sale">
+                                                <i class="fas fa-bolt me-1 text-warning"></i>Mark as Flash Sale
+                                            </label>
+                                            <div class="form-text mt-1">Flash sale items will be highlighted and shown in special promotions</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VAT Taxable Option -->
+                            <div class="col-12">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <div class="form-check form-switch">
+                                            {{ form.is_taxable(class="form-check-input", id="is_taxable", role="switch") }}
+                                            <label class="form-check-label fw-semibold" for="is_taxable">
+                                                <i class="fas fa-percent me-1 text-success"></i>Subject to 13% VAT
+                                            </label>
+                                            <div class="form-text mt-1">Check this if this product is subject to 13% Value Added Tax (VAT)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="col-12">
+                                <hr class="my-3">
+                                <div class="d-flex gap-3 flex-wrap">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5 hover-effect">
+                                        <i class="fas fa-save me-2"></i>{{ form.add_product.label.text }}
+                                    </button>
+                                    <a href="/shop-items" class="btn btn-outline-secondary btn-lg px-5 hover-effect">
+                                        <i class="fas fa-times me-2"></i>Cancel
+                                    </a>
+                                    <button type="button" class="btn btn-outline-info btn-lg px-5 hover-effect" id="resetForm">
+                                        <i class="fas fa-undo me-2"></i>Reset Form
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips Card -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <i class="fas fa-lightbulb fa-2x text-warning"></i>
+                        <div>
+                            <strong class="fw-semibold">Pro Tips:</strong>
+                            <ul class="mb-0 mt-1">
+                                <li>Use high-quality images for better product visibility</li>
+                                <li>Set competitive prices to attract more customers</li>
+                                <li>Keep track of inventory to avoid stockouts</li>
+                                <li>Previous price helps show discount percentage</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const subcategoryMap = {
+        'Supermarket': ['Rice & Staples', 'Snacks & Packaged Food', 'Beverages', 'Dairy Products', 'Cooking Essentials'],
+        'Health & Beauty': ['Skincare', 'Haircare', 'Makeup', 'Fragrances', 'Personal Care'],
+        'Home & Office': ['Furniture', 'Kitchen & Dining', 'Home Decor', 'Cleaning Supplies', 'Office Supplies'],
+        'Fashion': ['Men’s Wear', 'Women’s Wear', 'Footwear', 'Bags', 'Accessories'],
+        'Electronics': ['Televisions', 'Home Appliances', 'Audio Devices', 'Computer Accessories', 'Gadgets'],
+        'Gaming': ['Consoles', 'Controllers', 'PC Gaming', 'Video Games', 'Gaming Accessories'],
+        'Baby Products': ['Baby Clothing', 'Diapers & Wipes', 'Toys', 'Feeding Essentials', 'Baby Care'],
+        'Sporting Goods': ['Fitness Equipment', 'Gym Accessories', 'Outdoor Sports', 'Sportswear', 'Cycling'],
+        'Garden & Outdoor': ['Plants & Seeds', 'Gardening Tools', 'Outdoor Furniture', 'Camping & BBQ', 'Planters'],
+    };
+
+    function populateSubcategories(category, selectedValue = '') {
+        const subcategorySelect = document.getElementById('subcategory');
+        if (!subcategorySelect) return;
+
+        const options = subcategoryMap[category] || [];
+        subcategorySelect.innerHTML = '';
+
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select a subcategory';
+        subcategorySelect.appendChild(placeholderOption);
+
+        options.forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub;
+            option.textContent = sub;
+            if (sub === selectedValue) {
+                option.selected = true;
+            }
+            subcategorySelect.appendChild(option);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const categorySelect = document.getElementById('category');
+        const subcategorySelect = document.getElementById('subcategory');
+        if (!categorySelect || !subcategorySelect) return;
+
+        const selectedValue = subcategorySelect.dataset.selected || subcategorySelect.value || '';
+        populateSubcategories(categorySelect.value || 'Supermarket', selectedValue);
+
+        categorySelect.addEventListener('change', event => {
+            populateSubcategories(event.target.value);
+        });
+    });
+</script>
+
+<style>
+    /* Custom Styles */
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .hover-effect {
+        transition: all 0.3s ease;
+    }
+
+    .hover-effect:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .form-control, .form-select {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .form-control-lg, .form-select-lg {
+        border-radius: 12px;
+    }
+
+    .image-upload-container {
+        position: relative;
+    }
+
+    .image-preview {
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-check-input:checked {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .input-group-text {
+        border-radius: 10px 0 0 10px;
+    }
+
+    .input-group .form-control {
+        border-radius: 0 10px 10px 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .display-6 {
+            font-size: 1.5rem;
+        }
+        
+        .btn-lg {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .form-control-lg, .form-select-lg {
+            font-size: 0.875rem;
+        }
+        
+        .card-body {
+            padding: 1.25rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container-fluid {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .btn-lg {
+            width: 100%;
+        }
+        
+        .d-flex.gap-3 {
+            flex-direction: column;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+    }
+
+    /* Animation for form fields */
+    .form-control, .form-select {
+        animation: slideIn 0.4s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Stagger animation for form fields */
+    .row.g-4 > .col-md-6:nth-child(1) { animation-delay: 0.05s; }
+    .row.g-4 > .col-md-6:nth-child(2) { animation-delay: 0.1s; }
+    .row.g-4 > .col-md-6:nth-child(3) { animation-delay: 0.15s; }
+    .row.g-4 > .col-md-6:nth-child(4) { animation-delay: 0.2s; }
+    .row.g-4 > .col-md-6:nth-child(5) { animation-delay: 0.25s; }
+    .row.g-4 > .col-md-6:nth-child(6) { animation-delay: 0.3s; }
+</style>
+
+<script>
+    // Image preview functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('product_picture');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const removeImageBtn = document.getElementById('removeImage');
+        
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Please select a valid image file (JPG, PNG, or GIF)');
+                        this.value = '';
+                        imagePreview.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Validate file size (5MB max)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File size must be less than 5MB');
+                        this.value = '';
+                        imagePreview.style.display = 'none';
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            });
+        }
+        
+        if (removeImageBtn) {
+            removeImageBtn.addEventListener('click', function() {
+                imageInput.value = '';
+                imagePreview.style.display = 'none';
+                previewImg.src = '#';
+            });
+        }
+        
+        // Price validation
+        const currentPrice = document.getElementById('current_price');
+        const previousPrice = document.getElementById('previous_price');
+        
+        function validatePrices() {
+            if (currentPrice && previousPrice) {
+                const current = parseFloat(currentPrice.value);
+                const previous = parseFloat(previousPrice.value);
+                
+                if (previous && current && previous < current) {
+                    previousPrice.setCustomValidity('Previous price should be higher than current price for discount display');
+                    previousPrice.classList.add('is-invalid');
+                } else {
+                    previousPrice.setCustomValidity('');
+                    previousPrice.classList.remove('is-invalid');
+                }
+            }
+        }
+        
+        if (currentPrice) {
+            currentPrice.addEventListener('change', validatePrices);
+        }
+        if (previousPrice) {
+            previousPrice.addEventListener('change', validatePrices);
+        }
+        
+        // Stock quantity validation
+        const stockInput = document.getElementById('in_stock');
+        if (stockInput) {
+            stockInput.addEventListener('change', function() {
+                let value = parseInt(this.value);
+                if (isNaN(value) || value < 0) {
+                    this.value = 0;
+                }
+                if (value > 99999) {
+                    if (confirm('Stock quantity is very high. Are you sure?')) {
+                        // Allow it
+                    } else {
+                        this.value = 0;
+                    }
+                }
+            });
+        }
+        
+        // Reset form
+        const resetBtn = document.getElementById('resetForm');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset all form fields?')) {
+                    document.getElementById('productForm').reset();
+                    imagePreview.style.display = 'none';
+                    previewImg.src = '#';
+                    
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-info alert-dismissible fade show mt-3';
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-info-circle me-2"></i>
+                        Form has been reset successfully!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.querySelector('.card-body').insertBefore(alertDiv, document.querySelector('form'));
+                    
+                    setTimeout(() => {
+                        alertDiv.remove();
+                    }, 3000);
+                }
+            });
+        }
+        
+        // Auto-calculate discount percentage
+        function showDiscountPreview() {
+            if (currentPrice && previousPrice) {
+                const current = parseFloat(currentPrice.value);
+                const previous = parseFloat(previousPrice.value);
+                
+                if (previous && current && previous > current) {
+                    const discount = ((previous - current) / previous * 100).toFixed(0);
+                    const discountPreview = document.getElementById('discountPreview');
+                    if (!discountPreview) {
+                        const preview = document.createElement('div');
+                        preview.id = 'discountPreview';
+                        preview.className = 'alert alert-success mt-2';
+                        preview.innerHTML = `<i class="fas fa-tag me-2"></i>Discount: ${discount}% OFF!`;
+                        currentPrice.parentNode.parentNode.appendChild(preview);
+                    } else {
+                        discountPreview.innerHTML = `<i class="fas fa-tag me-2"></i>Discount: ${discount}% OFF!`;
+                        discountPreview.style.display = 'block';
+                    }
+                } else {
+                    const discountPreview = document.getElementById('discountPreview');
+                    if (discountPreview) {
+                        discountPreview.style.display = 'none';
+                    }
+                }
+            }
+        }
+        
+        if (currentPrice && previousPrice) {
+            currentPrice.addEventListener('input', showDiscountPreview);
+            previousPrice.addEventListener('input', showDiscountPreview);
+        }
+    });
+</script>
+
+{% endblock %}

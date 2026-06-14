@@ -1,0 +1,64 @@
+{% extends 'forms.html' %}
+
+{% block title %} Login - ShopyNepal {% endblock %}
+
+{% block body %}
+
+<!-- Floating Background Shapes -->
+<div class="floating-shape"></div>
+<div class="floating-shape"></div>
+<div class="floating-shape"></div>
+<div class="floating-shape"></div>
+
+<!-- Login section start -->
+<section class="base" id="base-login">
+    <div class="base-content">
+        <div class="form">
+            <!-- Close Button -->
+            <button type="button" class="form-close-btn" onclick="window.location.href='{{ url_for('views.home') }}'" title="Go to Home">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <h3>
+                <i class="fas fa-shopping-cart me-2"></i>
+                Welcome Back
+            </h3>
+            <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 1.5rem; text-align: center;">
+                Sign in to continue your shopping experience
+            </p>
+
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <div class="email">
+                    <h4><i class="fas fa-envelope"></i> Email Address</h4>
+                    {{ form.email(placeholder="Enter your email address") }}
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                            <small style="color: var(--danger); display: block; margin-top: 0.25rem;">{{ error }}</small>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="password">
+                    <h4><i class="fas fa-lock"></i> Password</h4>
+                    {{ form.password(placeholder="Enter your password") }}
+                    {% if form.password.errors %}
+                        {% for error in form.password.errors %}
+                            <small style="color: var(--danger); display: block; margin-top: 0.25rem;">{{ error }}</small>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="buttons">
+                    <a href="/sign-up">
+                        <i class="fas fa-user-plus me-2"></i> Don't have an account? Sign Up
+                    </a>
+                    {{ form.submit(value="Sign In") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

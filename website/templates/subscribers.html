@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+
+{% block title %}Newsletter Subscribers | Admin Panel{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid px-3 px-md-4 px-lg-5 py-4" style="overflow-x: hidden;">
+    <!-- Header Section with Back Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+                <a href="/admin-page" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm hover-effect">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+                <div class="text-center text-sm-end">
+                    <h1 class="display-6 fw-bold gradient-text mb-0">
+                        <i class="fas fa-envelope me-3"></i>Newsletter Subscribers
+                    </h1>
+                    <p class="text-muted mt-2 mb-0">Manage newsletter subscribers</p>
+                </div>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 g-md-4 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm hover-lift">
+                <div class="card-body d-flex align-items-center justify-content-between p-3 p-md-4">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Subscribers</h6>
+                        <h2 class="mb-0 fw-bold">{{ subscribers|length }}</h2>
+                    </div>
+                    <div class="icon-circle bg-primary bg-opacity-10">
+                        <i class="fas fa-envelope fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm hover-lift">
+                <div class="card-body d-flex align-items-center justify-content-between p-3 p-md-4">
+                    <div>
+                        <h6 class="text-muted mb-1">Active Subscribers</h6>
+                        <h2 class="mb-0 fw-bold">{{ subscribers|selectattr('is_active', 'equalto', True)|list|length }}</h2>
+                    </div>
+                    <div class="icon-circle bg-success bg-opacity-10">
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm hover-lift">
+                <div class="card-body d-flex align-items-center justify-content-between p-3 p-md-4">
+                    <div>
+                        <h6 class="text-muted mb-1">This Month</h6>
+                        <h2 class="mb-0 fw-bold">{{ subscribers|length if not subscribers else (subscribers|selectattr('date_subscribed')|map(attribute='date_subscribed')|select('defined')|list|length) }}</h2>
+                    </div>
+                    <div class="icon-circle bg-info bg-opacity-10">
+                        <i class="fas fa-calendar-alt fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card stat-card border-0 shadow-sm hover-lift">
+                <div class="card-body d-flex align-items-center justify-content-between p-3 p-md-4">
+                    <div>
+                        <h6 class="text-muted mb-1">Unsubscribed</h6>
+                        <h2 class="mb-0 fw-bold">{{ subscribers|selectattr('is_active', 'equalto', False)|list|length }}</h2>
+                    </div>
+                    <div class="icon-circle bg-warning bg-opacity-10">
+                        <i class="fas fa-user-times fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscribers Table -->
+    {% if subscribers %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">
+                <i class="fas fa-list me-2 text-primary"></i>All Subscribers
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0 fw-semibold px-4 py-3">ID</th>
+                            <th class="border-0 fw-semibold px-4 py-3">Email Address</th>
+                            <th class="border-0 fw-semibold px-4 py-3">Status</th>
+                            <th class="border-0 fw-semibold px-4 py-3">Subscription Date</th>
+                            <th class="border-0 fw-semibold px-4 py-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subscriber in subscribers %}
+                        <tr data-subscriber-id="{{ subscriber.id }}" data-subscriber-email="{{ subscriber.email }}">
+                            <td class="px-4 py-3 fw-semibold">#{{ subscriber.id }}</td>
+                            <td class="px-4 py-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-envelope text-muted me-2"></i>
+                                    {{ subscriber.email }}
+                                </div>
+                            </td>
+                            <td class="px-4 py-3">
+                                {% if subscriber.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-muted">
+                                {{ subscriber.date_subscribed.strftime('%b %d, %Y %I:%M %p') if subscriber.date_subscribed else 'N/A' }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="btn-group" role="group">
+                                    {% if subscriber.is_active %}
+                                    <button class="btn btn-sm btn-outline-warning" onclick="toggleSubscriber({{ subscriber.id }}, false)">
+                                        <i class="fas fa-pause"></i> Deactivate
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-sm btn-outline-success" onclick="toggleSubscriber({{ subscriber.id }}, true)">
+                                        <i class="fas fa-play"></i> Activate
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteSubscriber({{ subscriber.id }})">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body text-center py-5">
+                    <div class="empty-state-icon mb-4">
+                        <i class="fas fa-envelope-open fa-5x text-muted"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">No Subscribers Yet</h3>
+                    <p class="text-muted mb-4">Newsletter subscribers will appear here once people start subscribing.</p>
+                    <a href="/" class="btn btn-primary btn-lg rounded-pill px-5 hover-effect">
+                        <i class="fas fa-home me-2"></i>Go to Homepage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete this subscriber? This action cannot be undone.</p>
+                <p class="text-danger fw-semibold">Email: <span id="deleteEmail"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Subscriber</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Footer space fix - Main CSS */
+html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Fix for footer spacing */
+footer, .footer {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+    right: 0 !important;
+    left: 0 !important;
+}
+
+/* Fix container and row issues */
+.container, .container-fluid {
+    overflow-x: hidden !important;
+}
+
+.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Remove any right spacing from all elements */
+* {
+    max-width: 100% !important;
+}
+
+/* Your existing styles */
+.icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #f57224 0%, #e05c10 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.empty-state-icon {
+    opacity: 0.5;
+}
+
+/* Mobile responsive fixes for footer */
+@media only screen and (max-width: 768px) {
+    footer, .footer {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 10px 0 !important;
+        position: relative !important;
+        right: 0 !important;
+        left: 0 !important;
+    }
+    
+    .container-fluid {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+    
+    .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    .col-12, .col-6, .col-md-3 {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+}
+
+/* Fix for extra small devices */
+@media only screen and (max-width: 480px) {
+    footer, .footer {
+        padding: 8px 0 !important;
+    }
+    
+    .container-fluid {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+    
+    .btn-group {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .btn-group .btn {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+}
+
+/* Fix for tablets */
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+    footer, .footer {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .container-fluid {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+}
+
+/* Table responsive fix */
+@media only screen and (max-width: 768px) {
+    .table-responsive {
+        width: 100% !important;
+        overflow-x: auto !important;
+    }
+    
+    .table {
+        min-width: 600px !important;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+        margin: 0 !important;
+    }
+}
+
+/* Ensure modal doesn't cause overflow */
+.modal {
+    overflow-x: hidden !important;
+}
+
+.modal-dialog {
+    margin: 10px auto !important;
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 5px !important;
+    }
+}
+</style>
+
+<script>
+function toggleSubscriber(id, activate) {
+    const action = activate ? 'activate' : 'deactivate';
+    if (confirm(`Are you sure you want to ${action} this subscriber?`)) {
+        fetch(`/admin/toggle-subscriber/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ activate: activate })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
+    }
+}
+
+function deleteSubscriber(id) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const emailSpan = document.getElementById('deleteEmail');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    // Find subscriber row using data attribute
+    const row = document.querySelector(`tr[data-subscriber-id="${id}"]`);
+    const email = row.getAttribute('data-subscriber-email');
+    
+    emailSpan.textContent = email;
+    confirmBtn.onclick = () => {
+        fetch(`/admin/delete-subscriber/${id}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
+    };
+    
+    modal.show();
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,961 @@
+{% extends 'base.html' %}
+
+{% block title %} My Profile | ShopyNepal {% endblock %}
+
+{% block body %}
+
+<style>
+    :root {
+        --primary: #f57224;
+        --primary-dark: #e05c10;
+        --primary-light: #fff0e6;
+        --primary-glow: rgba(245,114,36,0.15);
+        --secondary: #2c3e50;
+        --dark: #1a2634;
+        --gray: #6c757d;
+        --light-bg: #f8fafc;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+        --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+        --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+        --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+        --radius: 24px;
+        --radius-sm: 16px;
+        --transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    /* Profile Hero */
+    .profile-hero {
+        background: linear-gradient(135deg, var(--primary-light) 0%, #ffffff 50%, var(--primary-light) 100%);
+        border-radius: var(--radius);
+        padding: 2rem 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-hero::before {
+        content: '👤';
+        position: absolute;
+        bottom: -20px;
+        right: -20px;
+        font-size: 120px;
+        opacity: 0.05;
+    }
+
+    .profile-hero::after {
+        content: '⭐';
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        font-size: 100px;
+        opacity: 0.05;
+    }
+
+    .welcome-title {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .welcome-subtitle {
+        color: var(--gray);
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Sidebar Navigation */
+    .profile-sidebar {
+        background: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        position: sticky;
+        top: 100px;
+        transition: var(--transition);
+    }
+
+    .profile-sidebar:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    .sidebar-header {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        padding: 1.5rem;
+        text-align: center;
+        color: white;
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2.5rem;
+    }
+
+    .sidebar-username {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .sidebar-email {
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+
+    .nav-links {
+        padding: 1rem 0;
+    }
+
+    .nav-link-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0.9rem 1.5rem;
+        color: var(--dark);
+        text-decoration: none;
+        transition: var(--transition);
+        border-left: 3px solid transparent;
+    }
+
+    .nav-link-item:hover {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-left-color: var(--primary);
+    }
+
+    .nav-link-item.active {
+        background: var(--primary-light);
+        color: var(--primary);
+        border-left-color: var(--primary);
+        font-weight: 600;
+    }
+
+    .nav-link-item i {
+        width: 24px;
+        font-size: 1.1rem;
+        color: var(--primary);
+    }
+
+    /* Profile Cards */
+    .profile-card {
+        background: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        transition: var(--transition);
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-card:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    .card-header-custom {
+        padding: 1.2rem 1.5rem;
+        border-bottom: 2px solid #f0f2f5;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-header-custom i {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .card-body-custom {
+        padding: 1.5rem;
+    }
+
+    /* Info Display */
+    .info-row {
+        display: flex;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        width: 120px;
+        font-weight: 600;
+        color: var(--gray);
+    }
+
+    .info-value {
+        flex: 1;
+        color: var(--dark);
+        font-weight: 500;
+    }
+
+    .member-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--primary-light);
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        color: var(--primary);
+    }
+
+    /* Current Info Alert */
+    .current-info {
+        background: linear-gradient(135deg, #e8f4f8, #d1e9f0);
+        border-radius: var(--radius-sm);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--info);
+    }
+
+    .current-info-title {
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .current-info-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .current-info-item {
+        background: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        color: var(--dark);
+    }
+
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 1.2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 0.9rem;
+    }
+
+    .form-label .required {
+        color: var(--danger);
+        margin-left: 3px;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        background: white;
+    }
+
+    .form-control-custom:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px var(--primary-glow);
+        outline: none;
+    }
+
+    .error-message {
+        color: var(--danger);
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-update {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 0.9rem 1.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: var(--transition);
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .welcome-title {
+            font-size: 1.6rem;
+        }
+        
+        .profile-sidebar {
+            position: static;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-label {
+            width: 100px;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .profile-hero {
+            padding: 1.5rem;
+        }
+        
+        .welcome-title {
+            font-size: 1.3rem;
+        }
+        
+        .info-row {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .info-label {
+            width: 100%;
+        }
+        
+        .card-header-custom {
+            padding: 1rem;
+        }
+        
+        .card-body-custom {
+            padding: 1rem;
+        }
+        
+        .current-info-content {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+        
+        .nav-link-item {
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Animations */
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+    }
+
+    .animate-on-scroll.animated {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Toast Notification */
+    .toast-notification {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 9999;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        border-left: 4px solid var(--success);
+    }
+
+    .toast-notification.show {
+        transform: translateX(0);
+    }
+</style>
+
+<div class="container my-5">
+    <!-- Profile Hero -->
+    <div class="profile-hero animate-on-scroll">
+        <h1 class="welcome-title">
+            <i class="fas fa-user-circle" style="color: var(--primary);"></i> 
+            Welcome back, <span class="text-capitalize">{{ customer.username }}</span>!
+        </h1>
+        <p class="welcome-subtitle">Manage your profile, delivery information, and account settings</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Sidebar Column -->
+        <div class="col-lg-3">
+            <div class="profile-sidebar animate-on-scroll">
+                <div class="sidebar-header">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="sidebar-username">{{ customer.username }}</div>
+                    <div class="sidebar-email">{{ customer.email }}</div>
+                </div>
+                <div class="nav-links">
+                    <a href="#profile-section" class="nav-link-item active" id="profileTab">
+                        <i class="fas fa-id-card"></i> Profile
+                    </a>
+                    <a href="/change-password/{{ customer.id }}" class="nav-link-item">
+                        <i class="fas fa-key"></i> Change Password
+                    </a>
+                    <a href="/messages" class="nav-link-item">
+                        <i class="fas fa-comments"></i> Messages & Chat
+                        <span class="badge" style="background: var(--primary); color: white; margin-left: auto;">New</span>
+                    </a>
+                    <a href="/orders" class="nav-link-item">
+                        <i class="fas fa-box"></i> My Orders
+                    </a>
+                    <a href="/wishlist" class="nav-link-item">
+                        <i class="fas fa-heart"></i> Wishlist
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Column -->
+        <div class="col-lg-9">
+            <!-- Profile Information Card -->
+            <div class="profile-card animate-on-scroll" id="profile-section">
+                <div class="card-header-custom">
+                    <i class="fas fa-id-card"></i>
+                    <h5>Profile Information</h5>
+                </div>
+                <div class="card-body-custom">
+                    <div class="info-row">
+                        <div class="info-label">Username</div>
+                        <div class="info-value">{{ customer.username }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Email Address</div>
+                        <div class="info-value">{{ customer.email }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Member Since</div>
+                        <div class="info-value">
+                            <span class="member-badge">
+                                <i class="fas fa-calendar-alt"></i> 
+                                {{ customer.date_joined.strftime('%B %d, %Y') }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Account Status</div>
+                        <div class="info-value">
+                            <span class="badge" style="background: var(--success); color: white;">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Information Card -->
+            <div class="profile-card animate-on-scroll">
+                <div class="card-header-custom">
+                    <i class="fas fa-truck"></i>
+                    <h5>Delivery Information</h5>
+                </div>
+                <div class="card-body-custom">
+                    {% if customer.full_name %}
+                    <div class="current-info">
+                        <div class="current-info-title">
+                            <i class="fas fa-info-circle"></i> Saved Delivery Address
+                        </div>
+                        <div class="current-info-content">
+                            <span class="current-info-item"><i class="fas fa-user"></i> {{ customer.full_name }}</span>
+                            <span class="current-info-item"><i class="fas fa-phone"></i> {{ customer.phone_number }}</span>
+                            <span class="current-info-item"><i class="fas fa-location-dot"></i> {{ customer.street_address }}, {{ customer.city }}, {{ customer.zip_code }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert" style="background: var(--primary-light); border: none; border-radius: 12px;">
+                        <i class="fas fa-info-circle" style="color: var(--primary);"></i>
+                        No delivery information saved yet. Please add your delivery address below.
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" id="deliveryForm">
+                        {{ form.hidden_tag() }}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name <span class="required">*</span></label>
+                                    {{ form.full_name(class="form-control-custom", placeholder="Enter your full name") }}
+                                    {% if form.full_name.errors %}
+                                        <div class="error-message">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            {% for error in form.full_name.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Phone Number <span class="required">*</span></label>
+                                    {{ form.phone_number(class="form-control-custom", placeholder="e.g., 9801234567") }}
+                                    {% if form.phone_number.errors %}
+                                        <div class="error-message">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            {% for error in form.phone_number.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Street Address <span class="required">*</span></label>
+                            {{ form.street_address(class="form-control-custom", placeholder="House number, street name, landmark") }}
+                            {% if form.street_address.errors %}
+                                <div class="error-message">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {% for error in form.street_address.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">City <span class="required">*</span></label>
+                                    {{ form.city(class="form-control-custom", placeholder="Kathmandu, Pokhara, etc.") }}
+                                    {% if form.city.errors %}
+                                        <div class="error-message">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            {% for error in form.city.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">ZIP/Postal Code</label>
+                                    {{ form.zip_code(class="form-control-custom", placeholder="Optional") }}
+                                    {% if form.zip_code.errors %}
+                                        <div class="error-message">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            {% for error in form.zip_code.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn-update" id="updateBtn">
+                                <i class="fas fa-save"></i> Update Delivery Information
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Stats Card
+            <div class="profile-card animate-on-scroll">
+                <div class="card-header-custom">
+                    <i class="fas fa-chart-line"></i>
+                    <h5>Account Summary</h5>
+                </div>
+                <div class="card-body-custom">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="text-center p-3" style="background: var(--primary-light); border-radius: var(--radius-sm);">
+                                <i class="fas fa-shopping-bag" style="font-size: 2rem; color: var(--primary);"></i>
+                                <h3 class="mt-2 mb-0" style="font-weight: 800;">{{ orders_count|default('0') }}</h3>
+                                <small class="text-muted">Total Orders</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3" style="background: var(--primary-light); border-radius: var(--radius-sm);">
+                                <i class="fas fa-heart" style="font-size: 2rem; color: var(--primary);"></i>
+                                <h3 class="mt-2 mb-0" style="font-weight: 800;">{{ wishlist_count|default('0') }}</h3>
+                                <small class="text-muted">Wishlist Items</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3" style="background: var(--primary-light); border-radius: var(--radius-sm);">
+                                <i class="fas fa-clock" style="font-size: 2rem; color: var(--primary);"></i>
+                                <h3 class="mt-2 mb-0" style="font-weight: 800;">{{ pending_orders|default('0') }}</h3>
+                                <small class="text-muted">Pending Orders</small>
+                            </div>
+                        </div>
+                    </div> -->
+                <!-- </div> -->
+            <!-- </div> -->
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toastNotification" class="toast-notification">
+    <i class="fas fa-check-circle" style="color: var(--success); font-size: 1.3rem;"></i>
+    <span id="toastMessage">Profile updated successfully!</span>
+</div>
+
+<script>
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toastNotification');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = toast.querySelector('i');
+        
+        toastMessage.textContent = message;
+        
+        if (type === 'success') {
+            toastIcon.className = 'fas fa-check-circle';
+            toastIcon.style.color = 'var(--success)';
+            toast.className = 'toast-notification show';
+        } else {
+            toastIcon.className = 'fas fa-exclamation-circle';
+            toastIcon.style.color = 'var(--danger)';
+            toast.className = 'toast-notification show';
+        }
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    
+    // Form submission handling
+    const form = document.getElementById('deliveryForm');
+    const submitBtn = document.getElementById('updateBtn');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Updating...';
+            submitBtn.disabled = true;
+        });
+    }
+    
+    // Show flash messages as toast
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                showToast('{{ message }}', '{{ category }}');
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    // Active tab highlighting
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.nav-link-item').forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+        }
+    });
+    
+    // Animation on scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const animateElements = document.querySelectorAll('.animate-on-scroll');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animated');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        animateElements.forEach(el => observer.observe(el));
+    });
+</script>
+
+<!-- Chat Widget (only for logged-in users) -->
+<style>
+    .chat-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f57224, #ff8a42);
+        color: white;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(245, 114, 36, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        z-index: 999;
+        transition: all 0.3s ease;
+    }
+    .chat-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(245, 114, 36, 0.4);
+    }
+    .chat-modal {
+        display: none;
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 400px;
+        height: 500px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 5px 40px rgba(0, 0, 0, 0.16);
+        z-index: 1000;
+        flex-direction: column;
+        animation: slideUp 0.3s ease;
+        border: 1px solid rgba(245,114,36,0.2);
+    }
+    .chat-modal.active {
+        display: flex;
+    }
+    @keyframes slideUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    .chat-header {
+        background: linear-gradient(95deg, #f57224, #f7893c);
+        color: white;
+        padding: 16px;
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .chat-close {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 20px;
+    }
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        background: #f9f9f9;
+    }
+    .chat-message {
+        margin-bottom: 12px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        word-wrap: break-word;
+    }
+    .chat-message.admin {
+        background: #e8f4f8;
+        border-left: 3px solid #17a2b8;
+    }
+    .chat-message.customer {
+        background: #fff3cd;
+        border-left: 3px solid #f57224;
+        margin-left: 20px;
+    }
+    .chat-message-time {
+        font-size: 11px;
+        color: #888;
+        margin-top: 4px;
+    }
+    .chat-form {
+        padding: 12px;
+        border-top: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .chat-form input,
+    .chat-form textarea {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 13px;
+        font-family: inherit;
+    }
+    .chat-form button {
+        background: #f57224;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+    .chat-form button:hover {
+        background: #e05c10;
+    }
+    .chat-loading {
+        text-align: center;
+        padding: 20px;
+        color: #888;
+    }
+    @media (max-width: 560px) {
+        .chat-modal {
+            width: calc(100vw - 40px);
+            right: 20px;
+            bottom: 80px;
+            height: 480px;
+        }
+    }
+</style>
+
+<button class="chat-button" id="chatBtn" onclick="toggleChat()">
+    <i class="fas fa-comments"></i>
+</button>
+
+<div class="chat-modal" id="chatModal">
+    <div class="chat-header">
+        <h5 class="mb-0">
+            <i class="fas fa-headset me-2"></i>Support Chat
+        </h5>
+        <button class="chat-close" onclick="toggleChat()">×</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="chat-loading">Loading messages...</div>
+    </div>
+    <form class="chat-form" id="chatForm" onsubmit="sendChatMessage(event)">
+        <input type="text" id="chatSubject" placeholder="Subject" required>
+        <textarea id="chatText" placeholder="Type your message here..." required minlength="10"></textarea>
+        <button type="submit">Send Message</button>
+    </form>
+</div>
+
+<script>
+    let chatInterval;
+    
+    function toggleChat() {
+        const modal = document.getElementById('chatModal');
+        modal.classList.toggle('active');
+        if (modal.classList.contains('active')) {
+            loadMessages();
+            chatInterval = setInterval(loadMessages, 3000);
+        } else {
+            clearInterval(chatInterval);
+        }
+    }
+    
+    function loadMessages() {
+        fetch('/api/chat/messages')
+            .then(r => r.json())
+            .then(messages => {
+                const container = document.getElementById('chatMessages');
+                if (messages.length === 0) {
+                    container.innerHTML = '<div class="chat-loading">No messages yet. Start a conversation!</div>';
+                    return;
+                }
+                container.innerHTML = messages.map(msg => `
+                    <div class="chat-message ${msg.sender_type}">
+                        <strong>${msg.sender_type === 'admin' ? 'Admin Response' : 'Your Message'}</strong><br>
+                        <strong>Subject:</strong> ${escapeHtml(msg.subject)}<br>
+                        ${escapeHtml(msg.message_text)}
+                        <div class="chat-message-time">${msg.date_sent || new Date().toLocaleTimeString()}</div>
+                    </div>
+                `).join('');
+                container.scrollTop = container.scrollHeight;
+            })
+            .catch(err => console.error('Error loading messages:', err));
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function sendChatMessage(e) {
+        e.preventDefault();
+        const subject = document.getElementById('chatSubject').value;
+        const messageText = document.getElementById('chatText').value;
+        
+        if (messageText.length < 10) {
+            alert('Message must be at least 10 characters');
+            return;
+        }
+        
+        fetch('/api/chat/send', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({subject, message_text: messageText})
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('chatForm').reset();
+                loadMessages();
+            } else {
+                alert('Error: ' + (data.error || 'Failed to send'));
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('Error sending message');
+        });
+    }
+</script>
+
+{% endblock %}
