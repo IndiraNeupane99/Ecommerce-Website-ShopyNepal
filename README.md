@@ -38,19 +38,7 @@ Use a `.env` file with:
 - `SECRET_KEY`
 - `FLASK_ENV=development`
 
-## Login credentials
-
-- Admin login:
-  - Email: `admin@shopynepal.com`
-  - Password: `Admin@321`
-
-- Customer 1 login:
-  - Email: `user1@gmail.com`
-  - Password: `User1@123
   
-  Customer 2 login:
-  - Email: `user2@gmail.com`
-  - Password: `User2@123`
 
 ## Important files
 
